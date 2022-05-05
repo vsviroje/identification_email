@@ -89,6 +89,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if config.IsUserInSession(user.ID) {
+		logger.E("User already logged in ", user.ID)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(creds.Password)); err != nil {
 		logger.E("CompareHashAndPassword Failed for ", user.Password, creds.Password, creds.Email, err)
 		w.WriteHeader(http.StatusUnauthorized)

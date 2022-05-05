@@ -29,3 +29,17 @@ const (
 	ConstResendLimit       = "resend/time/limit"
 	ConstResendMaxCount    = "resend/max/count"
 )
+
+//logger
+const (
+	INFO  = "INFO"
+	DEBUG = "DEBUG"
+	ERROR = "ERROR"
+)
+
+//env mode
+const (
+	ENV                  = "env"
+	MODE                 = "mode"
+	ConstEnvModeNotfound = "Env mode not found"
+)

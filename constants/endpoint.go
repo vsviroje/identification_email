@@ -5,4 +5,5 @@ const (
 	ConstUserSignUp = "/user/signup"
 	ConstUserLogin  = "/user/login"
 	ConstUserLogout = "/user/logout"
+	ConstUserTest   = "/user/test"
 )

@@ -2,6 +2,8 @@ package utility
 
 import (
 	"bytes"
+	"identification_email/config"
+	"identification_email/utility/logger"
 	"net/http"
 )
 
@@ -35,4 +37,39 @@ func HttpRequest(method string, url string, body []byte, header map[string]strin
 		break
 	}
 	return res, err
+}
+
+// handler
+func Handler(originalHandler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		originalHandler.ServeHTTP(w, r)
+	})
+}
+
+func IsUserAuthorizated(r *http.Request) bool {
+	token := r.Header.Get("Authorization")
+	userID, isValid, err := ValidateToken(token)
+
+	if err != nil {
+		logger.E("ValidateToken failed", err)
+		return false
+	}
+
+	if !isValid {
+		logger.E("Not Authorized", userID)
+		config.DeleteUserFromSession(userID)
+		return false
+	}
+
+	return config.IsUserInSession(userID)
+}
+
+func AuthorizedHandler(originalHandler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !IsUserAuthorizated(r) {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		originalHandler.ServeHTTP(w, r)
+	})
 }

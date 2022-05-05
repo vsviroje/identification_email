@@ -2,8 +2,8 @@ package dbAccess
 
 import (
 	"database/sql"
-	"fmt"
 	"identification_email/models"
+	"identification_email/utility/logger"
 
 	"github.com/spf13/cast"
 )
@@ -12,6 +12,9 @@ import (
 // function will get otp row from table based on mobile and otp combination and if any error occur
 // it will return error
 func GetUserByEmail(email string) (*models.User, error) {
+	logger.I("GetUserByEmail invoked")
+	defer logger.I("GetUserByEmail returned")
+
 	sqlSmt := "select id,userName,name,email,phoneNum,password,createdAt,updatedAt from user where email = ?"
 
 	data := models.User{}
@@ -19,7 +22,7 @@ func GetUserByEmail(email string) (*models.User, error) {
 	var sqlRow *sql.Rows
 	sqlRow, err := DB.Query(sqlSmt, email)
 	if err != nil {
-		fmt.Println("Error occured while getting sql rows db", err)
+		logger.E("DB.Query Failed for ", sqlSmt, email, err)
 		return nil, err
 	}
 	defer sqlRow.Close()
@@ -42,17 +45,19 @@ func GetUserByEmail(email string) (*models.User, error) {
 // CreatOTPRow ...
 // function will receive top data as input based on that it will create row on table
 func CreatUser(data *models.Credentials) (err error) {
+	logger.I("CreatUser invoked")
+	defer logger.I("CreatUser returned")
 
 	sqlStr := "INSERT INTO user (userName,email,password) VALUES (?,?,?)"
 	// prepare the statement
 	var stmt *sql.Stmt
 	if stmt, err = DB.Prepare(sqlStr); err != nil {
-		fmt.Println("Error occured while prparing sql statement", err)
+		logger.E("DB.Prepare Failed for ", sqlStr, data.Email, err)
 		return
 	}
 	// format all vals at once
 	if _, err = stmt.Exec(data.Email, data.Email, data.Password); err != nil {
-		fmt.Println("Error occured while excuting create sql statement", err)
+		logger.E("stmt.Exec Failed for ", sqlStr, data, err)
 		return
 	}
 	return

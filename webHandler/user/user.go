@@ -3,25 +3,24 @@ package user
 import (
 	"identification_email/constants"
 	"identification_email/service"
+	"identification_email/utility"
+	"identification_email/utility/logger"
 	"net/http"
 )
 
 func RequestHandler() {
+	logger.I("RequestHandler invoked")
+	defer logger.I("RequestHandler returned")
 
 	signUp := http.HandlerFunc(service.SignUp)
-	http.Handle(constants.ConstUserSignUp, handler(signUp))
+	http.Handle(constants.ConstUserSignUp, utility.Handler(signUp))
 
 	logIn := http.HandlerFunc(service.Login)
-	http.Handle(constants.ConstUserLogin, handler(logIn))
+	http.Handle(constants.ConstUserLogin, utility.Handler(logIn))
 
-	logOut := http.HandlerFunc(service.LogOut)
-	http.Handle(constants.ConstUserLogout, handler(logOut))
+	logOut := http.HandlerFunc(service.Logout)
+	http.Handle(constants.ConstUserLogout, utility.AuthorizedHandler(logOut))
 
-}
-
-// handler
-func handler(originalHandler http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		originalHandler.ServeHTTP(w, r)
-	})
+	test := http.HandlerFunc(service.Test)
+	http.Handle(constants.ConstUserTest, utility.AuthorizedHandler(test))
 }

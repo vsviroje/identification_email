@@ -4,6 +4,7 @@ import (
 	"identification_email/config"
 	"identification_email/constants"
 	"identification_email/dbAccess"
+	"identification_email/utility/logger"
 	"identification_email/webHandler"
 	"log"
 	"net/http"
@@ -11,6 +12,8 @@ import (
 
 // main ...
 func main() {
+	logger.I("main invoked")
+	defer logger.I("main returned")
 
 	initMain()
 	defer deinitMain()
@@ -21,11 +24,17 @@ func main() {
 }
 
 func initMain() {
+	logger.I("initMain invoked")
+	defer logger.I("initMain returned")
+
 	webHandler.InitWebHandler()
 	dbAccess.ConnectDB()
 	config.GetGlobalConfigMap()
 }
 
 func deinitMain() {
+	logger.I("deinitMain invoked")
+	defer logger.I("deinitMain returned")
+
 	dbAccess.DisconnectDB()
 }
